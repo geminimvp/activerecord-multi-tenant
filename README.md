@@ -65,6 +65,13 @@ class ApplicationController < ActionController::Base
 end
 ```
 
+## Testing
+The test suite is designed to run against a docker cluster representing a citus cluster. To start it, run
+`docker-compose up -d`
+
+If you receive an error about the format of the docker-compose.yml file, verify that your docker install
+is up to date.
+
 ## Frequently Asked Questions
 
 * **What if I have a table that doesn't relate to my tenant?** (e.g. templates that are the same in every account)
@@ -74,6 +81,10 @@ end
 * **What if my tenant model is not defined in my application?**
 
   The tenant model does not have to be defined. Use the gem as if the model was present. `MultiTenant.with` accepts either a tenant id or model instance.
+
+* **What if I'm adding the gem to an existing application?**
+
+  After adding the tenant model, you will need to modify each sharded model's table to include a tenant_id column. You can then remove the primary key constraint on id for that table, and replace it with a compound primary key of the id and tenant_id columns (see MultiTenant::MigrationExtensions for the SQL commands to make this happen). Note that compound keys will mess up any existing foreign key relationships you may have, so you will need to re-establish those relationships on the compound key.
 
 ## Credits
 
